@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spleeter Audio Separator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f7f7f7;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="file"] {
+            margin: 10px 0;
+        }
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Spleeter Audio Separator</h2>
+    <form id="uploadForm">
+        <input type="file" id="audioFile" accept="audio/*" required />
+        <br />
+        <button type="submit">Separate Audio</button>
+    </form>
+    <div id="result" class="result"></div>
+</div>
+
+<script>
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const fileInput = document.getElementById('audioFile');
+        const file = fileInput.files[0];
+
+        if (!file) {
+            alert("Please select an audio file to upload.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const response = await fetch("http://localhost:8000/separate", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to separate audio.");
+            }
+
+            const result = await response.json();
+            document.getElementById('result').innerHTML = `
+                <p>Audio separated successfully!</p>
+                <p><a href="http://localhost:8000${result.vocals_url}" download>Download Vocals</a></p>
+                <p><a href="http://localhost:8000${result.accompaniment_url}" download>Download Accompaniment</a></p>
+            `;
+        } catch (error) {
+            document.getElementById('result').innerText = "An error occurred: " + error.message;
+        }
+    });
+</script>
+
+</body>
+</html>
