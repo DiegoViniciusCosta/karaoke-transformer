@@ -1,0 +1,11 @@
+librosa
+spleeter
+fastapi
+uvicorn
+python-multipart
+mutagen
+google-cloud-speech
+speech
+numpy
+scipy
+pandas
